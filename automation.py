@@ -347,9 +347,9 @@ def print_results(text, color_grid):
                 print(f"This places you in the top {info['cumulative'][score-2]}-{info['cumulative'][score-1]}% (sample size: {info['sample']})")
             else:
                 print(f"This places you in the top 0-{info['cumulative'][score-1]}% (sample size: {info['sample']})")
-        print(f"Distribution of Wordle {info["num"]} is {info["individual"]}")
-        index = info["individual"].index(max(info["individual"]))
-        print(f"{info["individual"][index]}% of people guessed this wordle in {index + 1} guesses")
+        print(f"Distribution of Wordle {info['num']} is {info['individual']}")
+        index = info['individual'].index(max(info['individual']))
+        print(f"{info['individual'][index]}% of people guessed this wordle in {index + 1} guesses")
     else:
         print(f"No distribution data for {answer}, as it was before Wordle 626.")
         print(f"Wordle: {wordle_num}, Date: {info['date']}")  
