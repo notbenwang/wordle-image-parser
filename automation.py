@@ -409,9 +409,9 @@ class Result():
             data_str.append(f"This places you in the top 0-{self.puzzle_data['cumulative'][self.score-1]}% (sample size: {self.puzzle_data['sample']})")
         else:
             data_str.append(f"This places you in the top {self.puzzle_data['cumulative'][self.score-2]}-{self.puzzle_data['cumulative'][self.score-1]}% (sample size: {self.puzzle_data['sample']})")
-        data_str.append((f"Distribution of Wordle {self.puzzle_data["num"]} is {self.puzzle_data["individual"]}"))
-        index = self.puzzle_data["individual"].index(max(self.puzzle_data["individual"]))
-        data_str.append(f"{self.puzzle_data["individual"][index]}% of people guessed this wordle in {index + 1} guesses")
+        data_str.append((f"Distribution of Wordle {self.puzzle_data['num']} is {self.puzzle_data['individual']}"))
+        index = self.puzzle_data['individual'].index(max(self.puzzle_data['individual']))
+        data_str.append(f"{self.puzzle_data['individual'][index]}% of people guessed this wordle in {index + 1} guesses")
         return data_str
 
 class ImageTool():
