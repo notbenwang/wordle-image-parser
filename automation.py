@@ -386,12 +386,33 @@ class Result():
         self.puzzle_number = puzzle_number
         self.puzzle_data = puzzle_data
 
-    def data_to_string(self):
+    def date_to_string(self):
         date_str = '2021-06-19'
         date = datetime.strptime(date_str, '%Y-%m-%d')
         new_date = date + timedelta(int(self.puzzle_number))
         return f"Wordle: {self.puzzle_number}, Date: {new_date.date()}"
+    
+    def data_to_string(self):
+        data_str = []
+        data_str.append(f"You scored solved this wordle in {self.score} guesses...")
+        if self.score == 7:
+            data_str.append("...which means you lost! Womp Womp!")
+            return data_str
+        if int(self.puzzle_number) == -1:
+            data_str.append("Solution for this wordle could not be found in the database.")
+            return data_str
+        if int(self.puzzle_number) < 626:
+            data_str.append(f"There is no distribution data for {self.answer}, as it was before Wordle 626 (earliest Wordle we have data on).")
+            return data_str
         
+        if self.score == 0:
+            data_str.append(f"This places you in the top 0-{self.puzzle_data['cumulative'][self.score-1]}% (sample size: {self.puzzle_data['sample']})")
+        else:
+            data_str.append(f"This places you in the top {self.puzzle_data['cumulative'][self.score-2]}-{self.puzzle_data['cumulative'][self.score-1]}% (sample size: {self.puzzle_data['sample']})")
+        data_str.append((f"Distribution of Wordle {self.puzzle_data["num"]} is {self.puzzle_data["individual"]}"))
+        index = self.puzzle_data["individual"].index(max(self.puzzle_data["individual"]))
+        data_str.append(f"{self.puzzle_data["individual"][index]}% of people guessed this wordle in {index + 1} guesses")
+        return data_str
 
 class ImageTool():
     def __init__(self) -> None:

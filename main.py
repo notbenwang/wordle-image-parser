@@ -40,7 +40,7 @@ def index():
     results = reader.get_data(wordle_statistic.text, wordle_statistic.color_grid)
     
     img_path_label = ui.label(f"URL: {default_url}")
-    results_label = ui.label(results.data_to_string())
+    results_label = ui.label(results.date_to_string())
     debug_dialog = ui.dialog() 
     with ui.row():
         wordle_image = ui.image(default_url).style('width: 300px; height: auto;')
@@ -68,6 +68,20 @@ def index():
     ui.button('Debug Dialog', on_click=lambda:debug_dialog.open())
     
     guesses_label = ui.label( array_to_string(wordle_statistic.text))
+    global data_labels
+    data_labels = []
+    data_column = ui.column()
+    with data_column:
+        for line in results.data_to_string():
+            data_labels.append(ui.label(line))
+    
+    def update_data_labels(lines):
+        global data_labels
+        data_column.clear()
+        data_labels.clear()
+        with data_column:
+            for line in lines:
+                data_labels.append(ui.label(line))
 
     def toggle_image(index, visible):
         global wordle_statistic
@@ -137,9 +151,10 @@ def index():
         wordle_statistic = reader.get_wordle_statistics_from_src(img_path)
         guesses_label.text = array_to_string(wordle_statistic.text)
         results = reader.get_data(wordle_statistic.text, wordle_statistic.color_grid)
-        results_label.text = results.data_to_string()
+        results_label.text = results.date_to_string()
         
         update_debug_images()
+        update_data_labels(results.data_to_string())
     
     def update_debug_images():
         for i, checkbox in enumerate(debug_checkboxes):
@@ -165,8 +180,9 @@ def index():
         guesses_label.text = array_to_string(wordle_statistic.text)
         img_path_label.text = "URL: " + wordle_statistic.filename
         results = reader.get_data(wordle_statistic.text, wordle_statistic.color_grid)
-        results_label.text = results.data_to_string()
+        results_label.text = results.date_to_string()
 
         update_debug_images()
+        update_data_labels(results.data_to_string())
 
 ui.run()
