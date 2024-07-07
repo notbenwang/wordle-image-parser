@@ -21,7 +21,8 @@ class Config():
     def __init__(self, pytesseract_path = PYTESSERACT_PATH, word_bank_path = WORDLE_WORD_BANK) -> None:
         # Unknown case when paths don't exist
         self.word_bank = create_word_bank_from_path(word_bank_path)
-        pytesseract.pytesseract.tesseract_cmd = pytesseract_path
+        if pytesseract_path:
+            pytesseract.pytesseract.tesseract_cmd = pytesseract_path
         self.word_bank_path = word_bank_path
         self.pytesseract_path = pytesseract_path
         self.db = WordleDatabase()
