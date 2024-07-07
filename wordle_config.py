@@ -56,6 +56,8 @@ class WordleDatabase():
             return self.list_pre[word]["number"]
         
     def getInfo(self, num):
+        if int(num) < 0:
+            return None
         if int(num) > 626:
             return self.puzzles[str(num)]
         else:
