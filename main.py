@@ -196,5 +196,5 @@ def index():
         update_data_labels(results.data_to_string())
         update_debug_images()
 
-if __name__ in {"__main__", "__mp_main__"}:
-    ui.run()
+print("UI RUN PLEASE")
+ui.run(reload=False)
