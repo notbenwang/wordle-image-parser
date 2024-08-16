@@ -197,4 +197,4 @@ def index():
         update_debug_images()
 
 print("UI RUN PLEASE")
-ui.run(uvicorn_logging_level="debug", reload=False)
+ui.run(uvicorn_logging_level="debug")
