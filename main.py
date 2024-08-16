@@ -15,11 +15,11 @@ def array_to_string(arr):
             string += ", "
     return string
 
-@ui.page('/')
+# @ui.page('/')
 
-def index():
-    ui.page_title("Wordle Image Parser")
-    ui.label("Wordle Image Parser")
+# def index():
+ui.page_title("Wordle Image Parser")
+ui.label("Wordle Image Parser")
     
     # with ui.row():
     #     number_input = ui.input("Manual Search")
