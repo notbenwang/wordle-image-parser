@@ -1,9 +1,11 @@
 import pytesseract
 import requests
 import json
+import os
 
 WORDLE_WORD_BANK = "valid-wordle-words.txt"
-PYTESSERACT_PATH = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+# PYTESSERACT_PATH = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+PYTESSERACT_PATH = os.getenv("TESSDATA_PREFIX")
 DATABASE_URL = "https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js"
 PRE_DATABASE_PATH = "pre640.json"
 PRE_DATABASE_KEY_PATH = "pre640_key.json"
