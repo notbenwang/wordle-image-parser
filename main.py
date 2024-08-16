@@ -1,4 +1,4 @@
-from nicegui import app, ui, events
+from nicegui import ui, events
 from automation import ImageTool
 import io
 import random
@@ -18,9 +18,6 @@ def array_to_string(arr):
 @ui.page('/')
 
 def index():
-    for url in app.urls:
-        ui.link(url, target=url)
-
     ui.page_title("Wordle Image Parser")
     ui.label("Wordle Image Parser")
     
@@ -199,4 +196,5 @@ def index():
         update_data_labels(results.data_to_string())
         update_debug_images()
 
-ui.run()
+if __name__ in {"__main__", "__mp_main__"}:
+    ui.run()
