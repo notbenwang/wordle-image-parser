@@ -169,20 +169,31 @@ def index():
 
     def handle_upload(e: events.UploadEventArguments):
         global wordle_statistic
-        ui.notify(f'Uploaded {e.name}')
+        
         image_pil = Image.open(io.BytesIO(e.content.read()))
         image_src = pillow_image_to_src(image_pil)
         
         file_upload_dialog.close()
-
+    
+        try:
+            wordle_statistic = reader.get_wordle_statistics_from_img(e.name, image_pil)
+            results = reader.get_data(wordle_statistic.text, wordle_statistic.color_grid)
+        except:
+            print("ERROR")
+            ui.notify("Error occurred when uploading image.", type='negative')
+            return
+        
+        if not wordle_statistic or not results:
+            ui.notify("Error occurred when uploading image.", type='negative')
+            return
+        ui.notify(f'Uploaded {e.name}')
         wordle_image.set_source(image_src)
-        wordle_statistic = reader.get_wordle_statistics_from_img(e.name, image_pil)
+
         guesses_label.text = array_to_string(wordle_statistic.text)
         img_path_label.text = "URL: " + wordle_statistic.filename
-        results = reader.get_data(wordle_statistic.text, wordle_statistic.color_grid)
+        
         results_label.text = results.date_to_string()
-
-        update_debug_images()
         update_data_labels(results.data_to_string())
+        update_debug_images()
 
 ui.run()
