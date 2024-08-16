@@ -197,4 +197,4 @@ def index():
         update_debug_images()
 
 print("UI RUN PLEASE")
-ui.run(reload=False)
+ui.run()
