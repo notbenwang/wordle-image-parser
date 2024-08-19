@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Parser</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+</head>
+<body>
+    <div class="container mx-auto">
+        <div class="flex flex-col justify-center items-center">
+
+            <p class="mt-5 text-black font-bold text-4xl font-sans text-center">Wordle Parser</p>
+            <!-- <p class="">By Benjamin Wang, June 2024</p> -->
+            <!-- <input class=" mt-5" type="file" id="img_input" name="img_input" accept="image/png, image/jpeg"/> -->
+            <input class="block my-2.5 w-1/2 max-w-[250px] text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 
+            focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" type="file">
+            <button class="mb-5 bg-blue-500 hover:bg-blue-700 text-white text-sm py-2 px-4 rounded">Run Parser</button>
+            <p class="font-semibold">Current URL:</p>
+            <p class="font-extralight">{{default_url}}</p>
+            <img src="{{default_url}}"/>
+        </div>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
+</body>
+</html>
