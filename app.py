@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, request, render_template
 from automation import ImageTool
 
 app = Flask(__name__)
@@ -19,6 +19,12 @@ def startup():
 
 reader, default_url = startup()
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():
+    global default_url
+    if request.method == 'POST':
+        # print(request.files['file_input'])
+        file = request.files['file']
+        default_url = file.filename 
+        print(default_url)
     return render_template("app.html", default_url=default_url)
