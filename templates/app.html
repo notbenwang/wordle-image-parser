@@ -9,26 +9,56 @@
 </head>
 <body>
     <div class="container mx-auto">
-        <div class="flex flex-col justify-center items-center">
+        <div class="flex flex-col justify-center items-center pb-5">
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for msg in messages %}
+                    <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mt-5 font-light" role="alert">
+                        <p class="font-bold">Error</p>
+                        <p class="">{{msg}}</p>
+                        <p class="">Please ensure that the image you are submitting is a Wordle image.</p>
+                      </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-            <p class="mt-5 text-black font-bold text-4xl font-sans text-center">Wordle Parser</p>
-            <p class="">By Benjamin Wang, June 2024</p>
-            <!-- <input class=" mt-5" type="file" id="img_input" name="img_input" accept="image/png, image/jpeg"/> -->
-             <form method="post" onsubmit="handleFileUpload(event)" enctype="multipart/form-data">
-                <div class="flex flex-col justify-center items-center">
+            <p class="mt-5 text-black font-bold text-4xl font-sans text-center">Wordle Screenshot Parser</p>
+            <p class="font-light">
+                Play today's Wordle <a href="https://www.nytimes.com/games/wordle/index.html" class="text-blue-600 underline">here</a>
+                or play past Wordle's <a href=" https://wordlearchive.com/" class="text-blue-600 underline">here</a>.
+            </p>
+
+             <form method="post" onsubmit="handleFileUpload(event)" enctype="multipart/form-data" class="">
+                <div class="flex flex-col justify-center items-center pb-1">
                     <input class="block my-5 w-full max-w-[250px] text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 
                     focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="file_input" name="file" type="file" accept="image/png, image/jpeg">
                     <button class="mb-5 bg-blue-500 hover:bg-blue-700 text-white py-2 font-semibold px-4 rounded">Run Parser</button>
                 </div>
             </form>
-            <p class="font-semibold">Current URL:</p>
-            <p class="font-extralight">{{default_url}}</p>
-            <img class="my-5" src="static/{{default_url}}"/>
-        
+            <div class="flex flex-col justify-center items-center outline outline-stone-300 p-5 bg-stone-50">
+
+                <p class="font-semibold">Current URL:</p>
+                <p class="font-extralight">{{default_url}}</p>
+                <p class="mt-5 font-extralight">{{results.date_to_string()}}</p>
+                <img class="mb-5" src="{{img_src}}"/>
+                <p class="font-semibold text-center mb-1">According to the parser,<br/>you guessed... </p>
+                {% for line in wordle_statistic.text %}
+                <p class="font-light">{{line}}</p>
+                {% endfor %}
+                <br/>
+                {% for line in results.data_to_string() %}
+                <p>{{line}}</p>
+                {% endfor %}
+                <br/>
+                <a href="" class="font-extralight text-sm text-red-500 underline">Was the parser incorrect?</a>
+            </div>
         </div>
     </div>
 
-
+    <footer>
+        <p class="p-5 text-center text-gray-500 font-extralight">&copy Benjamin Wang, 2024</p>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
     <script>
@@ -39,6 +69,12 @@
                 alert("Please upload a file before running the parser.")
                 e.preventDefault();
                 return false 
+            } else {
+                if (file.files[0].size > 2097152) {
+                    alert("File upload size is a maximum of 2MB.")
+                    e.preventDefault();
+                    return false
+                }
             }
             
         }
