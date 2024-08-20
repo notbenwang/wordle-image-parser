@@ -24,10 +24,12 @@
             {% endwith %}
 
             <p class="mt-5 text-black font-bold text-4xl font-sans text-center">Wordle Screenshot Parser</p>
+            <a class="text-center text-sm font-light text-blue-600" href="https://github.com/notbenwang/wordle-image-parser">Github</a>
             <p class="font-light">
                 Play today's Wordle <a href="https://www.nytimes.com/games/wordle/index.html" class="text-blue-600 underline">here</a>
                 or play past Wordle's <a href=" https://wordlearchive.com/" class="text-blue-600 underline">here</a>.
             </p>
+            
 
              <form method="post" onsubmit="handleFileUpload(event)" enctype="multipart/form-data" class="">
                 <div class="flex flex-col justify-center items-center pb-1">
@@ -38,7 +40,7 @@
                     <button class="mb-5 bg-blue-500 hover:bg-blue-700 text-white py-2 font-semibold px-4 rounded">Run Parser</button>
                 </div>
             </form>
-            <div class="flex flex-col justify-center items-center outline outline-stone-300 p-5 bg-stone-50">
+            <div class="flex flex-col justify-center items-center ">
 
                 <p class="font-semibold">Current URL:</p>
                 <p class="font-extralight">{{default_url}}</p>
@@ -53,7 +55,139 @@
                 <p class="text-center">{{line}}</p>
                 {% endfor %}
                 <br/>
-                <a href="" class="font-extralight text-sm text-red-500 underline">Was the parser incorrect?</a>
+                
+                <div id="accordion-open" data-accordion="open" class="w-[750px]">
+                    <h2 id="accordion-collapse-heading-2">
+                        <button type="button" class="flex items-center justify-between w-full p-5 text-sm rtl:text-right 
+                        text-gray-500 bg-gray-50 border border-b-0 border-gray-200 dark:border-gray-700 dark:text-gray-500 hover:bg-gray-100 
+                        dark:hover:bg-gray-800 gap-3" data-accordion-target="#accordion-collapse-body-2" aria-expanded="false" aria-controls="accordion-collapse-body-2">
+                          <span>The parser was incorrect.</span>
+                          <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                          </svg>
+                        </button>
+                      </h2>
+                      <div id="accordion-collapse-body-2" class="hidden" aria-labelledby="accordion-collapse-heading-2">
+                        <div class="p-5 border border-b-0 border-gray-200 dark:border-gray-700 text-sm">
+                          <p>This parser isn't perfect, and most likely your image encountered/contains an edge case that has 
+                            caused the parser to not work as expected. 
+                          </p>
+                          <br/>
+                          <p>Before debugging why the parser was incorrect, here's a brief description of how the parser works:
+                            <ol class="list-decimal pl-5">
+                                <li>The parser isolates the 5x6 Wordle grid using OpenCV shape detection.</li>
+                                <li>The parser uses TesseractOCR to read the text on the grid.</li>
+                                <li>The parser then uses an autocorrect algorithm to clean up the TesseractOCR text.</li>
+                            </ol>
+                          </p>
+                          <p>
+                            <br/>
+                            <p class="font-bold">The parser got one of my guesses incorrect.</p>
+                            Even with the help of some filters, TesseractOCR seems to occasionally have problems reading certain letters in different contexts,
+                            which is we have Step 4 which is used to correct any inconsistencies with TesseractOCR. However, the autocorrect
+                            algorithm used is admittedly not the best solution and works based off relating the closest "real" word from the 
+                            misspelt word.
+                            <br/> <br/>
+                            For example, when given the word 'COURT', TesseractOCR struggles to read the letter 'C', giving the text: 'OURT'.
+                            Then, the autocorrect algorithm determines that 'OURT' is close to two specific words 'COURT' and 'YOURT'. 
+                            However, since the algorithm is unable to determine the commonality of words, it has no way to determine which of the two
+                            words is more likely to be the one originally written, and essentially has to guess off chance which word was written. 
+                            <br/> <br/>
+                            What this means is that when the parser gets a word incorrect, it most likely occurred because the autocorrect algorithm 
+                            chose the wrong autocorrected word. This isn't an error on your part; this likely just means that our current autocorrect algorithm
+                            needs some more work.
+                          </p>
+                          <p>
+                            <br/>
+                            <p class="font-bold">The parser said I guessed "-----".</p>
+                            The autocorrect algorithm has a limit in which it can relate a misspelt word to a real word. When the parser says
+                            you guessed '-----', this means it was unable to find an autocorrected word that falls within that limit.
+                            <br/> <br/>
+                            This usually happens when TesseractOCR is really struggling to read the text of the image. For instance, this could
+                            occur if there are stray letters/unexpected shapes within the grid. A fix to this problem is to make sure that the Wordle
+                            grid of the screenshot is free of possible obstacles that could interfere with TesseractOCR's text detection.
+                          </p>
+                          <p>
+                            <br/>
+                            <p class="font-bold">The parser says my image was uploaded, but an error was made when parsing the image.</p>
+                            This meant that the parser received your image, but that when running the above steps, some error
+                            occurred. While the exact error can vary amongst certain cases, the most common error is that the parser was unable
+                            to locate what it considers a "viable Wordle grid" (Step 1), which is a step to prevent the running of non-Wordle images
+                            on the parser. 
+                            <br/> <br/>
+                            If you encountered this error when there is a viable Wordle grid in the screenshot, then this probably means that your image is very busy,
+                            and the parser's logic considered some of that busy-ness as the presence of <a class="italic">multiple</a> Wordle grids,
+                            which can cause an error in the parser. 
+                            <br/> <br/>
+                            Ideally you shouldn't come across any of these errors if your Wordle screenshot is clear 
+                            and easily readable, but if you did, feel free to submit a ticket with the problematic screenshot attached and we'll look into it.
+                          </p>
+                        </div>
+                      </div>
+                      <h2 id="accordion-open-heading-3">
+                        <button type="button" class="flex items-center justify-between w-full p-5 text-sm rtl:text-right 
+                        text-gray-500 bg-gray-50 border border-b-0 border-gray-200 dark:border-gray-700 dark:text-gray-500 hover:bg-gray-100 
+                        dark:hover:bg-gray-800 gap-3"  data-accordion-target="#accordion-open-body-3" 
+                         aria-expanded="false" aria-controls="accordion-open-body-3">
+                          <span class="flex items-center">What's the story behind this parser?</span>
+                          <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                          </svg>
+                        </button>
+                      </h2>
+                      <div id="accordion-open-body-3" class="hidden" aria-labelledby="accordion-open-heading-3">
+                        <div class="p-5 border border-t-0 border-gray-200 dark:border-gray-700 text-sm">
+                          <p>On May 25th, 2022, myself and two of my other friends started a Wordle group chat in Discord, where we have since sent 
+                            the results of our Wordle's daily. It was around Winter 2022 that I first became curious on which of us three was the
+                            best (or worst) at Wordle statistically. While NYT does keep track of the score of its players, when we had first started the 
+                            group chat, the scores were tied to the cookies of the browsers, and over the year(s), we had lost
+                            all that data from before NYT switched it to be account-based. What this means was that the only way to truly confirm who was
+                            statistically the best at Wordle was to iterate through the group chat and manually tally up the scores. While I am
+                            pretty competitive in nature, that sounded like a lot of tedious work, so I instead opted to create code to do it for me. 
+                          </p>
+                          <p>
+                            <br/>
+                            As of August 2024, the parser has had three iterations. The first iteration was made around December 2022 and was a complete failure; 
+                            it was coded in Java and had less than a week of development before the project was scrapped. 
+                            <br/> <br/>
+                            The second iteration was made in Winter
+                            2023 and was foundational to the overall trajectory of this project as a whole. The second iteration was coded in Python and was my first 
+                            foray into OpenCV and TesseractOCR. Not to get too much into the specifics, this iteration of the parser couldn't read text, and instead
+                            used OpenCV to determine the amount of guesses any given Wordle screenshot had based on presence/orientation of the grid's colored squares. 
+                            While I didn't end up reusing any of this old code, this iteration of the parser did allow me to easily parse around 1400 wordle images 
+                            from the Discord group chat, of which this library of images would serve as foundational to testing of the current iteration of the parser.
+                            Development for this second iteration stopped when I had hit a roadblock with TesseractOCR, which caused me to shelve the project for a couple
+                            of months.
+                          </p>
+                          <p>
+                            <br/>
+                            This leads to the third and current iteration of the parser. During the Spring 2024 semester, I took a Foundations of Data Analysis class, which
+                            while not the most thrilling class ever, did serve as motivation and inspiration to work on this parser again. Using concepts
+                            I had learned from this class, I laid a plan for development and really ironed out the structure of the parser and its components, their
+                            interactions with each other, and how I would integrate it into my overall goal of deciphering the best Wordle player. I built upon the ideas
+                            of the second iteration and used different data analysis algorithms to optimize the concept. I also was able to finally integrate TesseractOCR
+                            into the project, with the key to its viability the addition of an autocorrect system, that would work to fix the inconsistencies that had plagued
+                            me during the parser's second iteration.
+                          </p>
+                          <p>
+                            <br/>
+                            In the end, I was able to optimize the parser to a standard that I was satisfied with. The second parser was only able to detect around 1400
+                            wordle images, while the third iteration of the parser was able to amass almost 2200 images, along with additional functionality in parsing
+                            the guesses which was not present in the second iteration. Though there were some small adjustments that could improve the parser (the autocorrect
+                            algorithm), it was ultimately functional enough that I was able to run the entire parser through the Wordle group chat to finally get the answer
+                            for which of my three friends was the best at Wordle. The results were that I ... was
+                            neither the best nor worst Wordle player out of the three of us. Kind of anticlimactic, but that's kind of how life goes, doesn't it?</p>
+                          </p>
+                          <p>
+                            <br/> So, yeah. The parser I used to do a whole bunch of data analysis is now hosted on this site, for whoever may decide they want to use it,
+                            flaws and all. 
+                          </p>
+                          <p><br/>
+                            
+                        </div>
+                      </div>
+                </div>
+
             </div>
         </div>
     </div>
