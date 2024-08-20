@@ -29,6 +29,10 @@ def startup():
 reader, default_url, wordle_statistic, results = startup()
 
 app.secret_key = os.urandom(12)
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -37,6 +41,12 @@ def index():
     if request.method == 'POST':
         # Convert input file into PIL and src
         file = request.files['file']
+
+        if not allowed_file(file.filename):
+            flash(f"Uploaded file is not an image.")
+            return render_template("app.html", default_url=default_url, img_src="static/wordle_images/image_497.jpg",
+                            results=results, wordle_statistic=wordle_statistic) 
+
         buffer = io.BytesIO()
         file.save(buffer)
         base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
