@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, flash
+from flask import Flask, request, render_template, flash, redirect
 from automation import ImageTool
 from PIL import Image, ImageDraw
 import io
@@ -34,7 +34,12 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/', methods=['GET'])
+def main_page():
+    if request.method == 'GET':
+        return redirect('/wordle-image-parser')
+
+@app.route('/wordle-image-parser', methods=['POST', 'GET'])
 def index():
     global default_url, results, wordle_statistic
     
