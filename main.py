@@ -14,67 +14,90 @@ def array_to_string(arr):
         if i != len(arr) - 1:
             string += ", "
     return string
+current_image_num = 0
 
 @ui.page('/')
 
 def index():
     ui.page_title("Wordle Image Parser")
-    ui.label("Wordle Image Parser")
     
-    with ui.row():
-        number_input = ui.input("Manual Search")
-        ui.button('Run Manual', on_click=lambda: run_automation(rand=False))
-        ui.button('Random Image', on_click=lambda: run_automation(rand=True))
+    with ui.column().classes('mx-auto'):
     
-        file_upload_dialog = ui.dialog()
-        with file_upload_dialog:
-            ui.upload(on_upload=lambda e: handle_upload(e),
-                on_rejected=lambda: ui.notify('Rejected!'),
-                max_file_size=1_000_000).classes('max-w-full').props('accept=".png, image/*"')
-        ui.button('Upload File', on_click=lambda:file_upload_dialog.open())
+        ui.label("Wordle Image Parser")
+        
+        with ui.row():
+            number_input = ui.input("Manual Search")
+            ui.button('Run Manual', on_click=lambda: run_automation(rand=False))
+        with ui.row():
+            ui.button('Random Image', on_click=lambda: run_automation(rand=True))
+            # ui.button('Increase', on_click=lambda: run_automation(rand=False))
 
-    default_url = "wordle_images/image_497.jpg"
+            file_upload_dialog = ui.dialog()
+            with file_upload_dialog:
+                ui.upload(on_upload=lambda e: handle_upload(e),
+                    on_rejected=lambda: ui.notify('Rejected!'),
+                    max_file_size=1_000_000).classes('max-w-full').props('accept=".png, image/*"')
+            ui.button('Upload File', on_click=lambda:file_upload_dialog.open())
+
+        default_url = f"wordle_images/image_{current_image_num}.jpg"
+        
+        global wordle_statistic
+        wordle_statistic = reader.get_wordle_statistics_from_src(default_url)
+        results = reader.get_data(wordle_statistic.text, wordle_statistic.color_grid)
+        
+        img_path_label = ui.label(f"URL: {default_url}")
+        results_label = ui.label(results.date_to_string())
+        debug_dialog = ui.dialog() 
+        with ui.row():
+            wordle_image = ui.image(default_url).style('width: 300px; height: auto;')
+        
+        debug_checkboxes = []
+        debug_images = []
+        debug_labels = []
+        checkbox_labels = ["Detected Points", "Estimated Points", "Cropbox", "Detect Text Filter"]
+        
+        with debug_dialog as dialog, ui.card().classes('w-300 h-128'):
+            ui.label('Debug Dialog')
+            with ui.column():
+                for i in range(4):
+                    checkbox = ui.checkbox(checkbox_labels[i])
+                    debug_labels.append(ui.label())
+                    debug_image = ui.image().style('width: 250px; height: auto;')
+                    debug_image.set_visibility(False)               
+                    debug_checkboxes.append(checkbox)
+                    debug_images.append(debug_image)
+                debug_checkboxes[0].on_value_change(lambda e: toggle_image(0, e.value))
+                debug_checkboxes[1].on_value_change(lambda e: toggle_image(1, e.value))
+                debug_checkboxes[2].on_value_change(lambda e: toggle_image(2, e.value))
+                debug_checkboxes[3].on_value_change(lambda e: toggle_image(3, e.value))
+                ui.button('Apply Settings', on_click=lambda:debug_dialog.close())
+        ui.button('Debug Dialog', on_click=lambda:debug_dialog.open())
+        with ui.row():
+            ui.button('Approve', color="green", on_click=lambda:handle_approve())
+            ui.button('Deny', color="red", on_click=lambda:handle_deny())
+        guesses_label = ui.label( array_to_string(wordle_statistic.text))
+        global data_labels
+        data_labels = []
+        data_column = ui.column()
+        with data_column:
+            for line in results.data_to_string():
+                data_labels.append(ui.label(line))
     
-    global wordle_statistic
-    wordle_statistic = reader.get_wordle_statistics_from_src(default_url)
-    results = reader.get_data(wordle_statistic.text, wordle_statistic.color_grid)
-    
-    img_path_label = ui.label(f"URL: {default_url}")
-    results_label = ui.label(results.date_to_string())
-    debug_dialog = ui.dialog() 
-    with ui.row():
-        wordle_image = ui.image(default_url).style('width: 300px; height: auto;')
-    
-    debug_checkboxes = []
-    debug_images = []
-    debug_labels = []
-    checkbox_labels = ["Detected Points", "Estimated Points", "Cropbox", "Detect Text Filter"]
-    
-    with debug_dialog as dialog, ui.card().classes('w-300 h-128'):
-        ui.label('Debug Dialog')
-        with ui.column():
-            for i in range(4):
-                checkbox = ui.checkbox(checkbox_labels[i])
-                debug_labels.append(ui.label())
-                debug_image = ui.image().style('width: 250px; height: auto;')
-                debug_image.set_visibility(False)               
-                debug_checkboxes.append(checkbox)
-                debug_images.append(debug_image)
-            debug_checkboxes[0].on_value_change(lambda e: toggle_image(0, e.value))
-            debug_checkboxes[1].on_value_change(lambda e: toggle_image(1, e.value))
-            debug_checkboxes[2].on_value_change(lambda e: toggle_image(2, e.value))
-            debug_checkboxes[3].on_value_change(lambda e: toggle_image(3, e.value))
-            ui.button('Apply Settings', on_click=lambda:debug_dialog.close())
-    ui.button('Debug Dialog', on_click=lambda:debug_dialog.open())
-    
-    guesses_label = ui.label( array_to_string(wordle_statistic.text))
-    global data_labels
-    data_labels = []
-    data_column = ui.column()
-    with data_column:
-        for line in results.data_to_string():
-            data_labels.append(ui.label(line))
-    
+    def handle_approve():
+        global current_image_num
+        with open("output.txt", 'a') as f:
+            f.write(f"{current_image_num} True\n")
+        current_image_num+=1
+        run_automation(rand=False, num=current_image_num)
+
+    def handle_deny():
+        global current_image_num
+        with open("output.txt", 'a') as f:
+            f.write(f"{current_image_num} False\n")
+        current_image_num+=1
+        run_automation(rand=False, num=current_image_num)
+        pass
+
     def update_data_labels(lines):
         global data_labels
         data_column.clear()
@@ -127,12 +150,14 @@ def index():
                 return
         debug_images[index].set_source(pillow_image_to_src(cpy))
     
-    def run_automation(rand=False):
+    def run_automation(rand=False, num=-1):
         global wordle_statistic
         for debug_image in debug_images:
             debug_image.source = ""
         if rand: # Get random image from test images
             img_path = f"wordle_images/image_{random.randint(0,1424)}.jpg"
+        if num >= 0:
+            img_path = f"wordle_images/image_{num}.jpg"
         else: # Handle input argument and get image path
             if not number_input.value:
                 return ui.notify('Field not entered.', type='warning')
